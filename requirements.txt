@@ -1,0 +1,6 @@
+pandas
+numpy
+SQLAlchemy
+yfinance
+python-dotenv
+pyarrow

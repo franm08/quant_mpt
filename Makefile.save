@@ -1,0 +1,32 @@
+.PHONY: venv install schema ingest returns export all clean
+
+venv:
+	python -m venv .venv
+
+install: venv
+	. .venv/bin/activate && pip install -r requirements.txt
+
+schema:
+	. .venv/bin/activate && python - <<'PY'
+import os
+from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
+load_dotenv()
+e = create_engine(os.getenv("DB_URL"), future=True)
+with e.begin() as con:
+    con.execute(text(open("sql/01_schema.sql").read()))
+print("[done] schema ready")
+PY
+
+ingest:
+	. .venv/bin/activate && python scripts/ingest_prices.py
+
+returns:
+	. .venv/bin/activate && python scripts/export_returns.py
+
+export: returns
+
+all: install schema ingest returns
+
+clean:
+
